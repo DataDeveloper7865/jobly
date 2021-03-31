@@ -52,12 +52,12 @@ router.get("/", async function (req, res, next) {
   const validator = jsonschema.validate(req.query, companyFilterSchema);
   if(!validator.valid){
     const errs = validator.errors.map(e => e.stack);
-    throw new BadRequestError(errs);
+    return next(new BadRequestError(errs));
   }
   const {minEmployees, maxEmployees} = req.query;
   // !! refactor?
   if((minEmployees && maxEmployees) && (minEmployees > maxEmployees)){
-    return new BadRequestError('min employees greater than max employees')
+    return next(new BadRequestError('min employees greater than max employees'))
   }
   const companies = await Company.findAll(req.query);
   return res.json({ companies });
