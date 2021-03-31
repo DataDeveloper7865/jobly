@@ -2,7 +2,6 @@ const { BadRequestError } = require("../expressError");
 
 // Writes SQL for partial update of a row of data
 function sqlForPartialUpdate(dataToUpdate, jsToSql) {
-  // !! how do we know the indices in keys and values 
   // will correspond if objects unordered?
   //pulls keys of dataToUpdate into an array
   const keys = Object.keys(dataToUpdate);
@@ -24,4 +23,47 @@ function sqlForPartialUpdate(dataToUpdate, jsToSql) {
   };
 }
 
-module.exports = { sqlForPartialUpdate };
+function filterUndefined(obj) {
+  for (let key in obj) {
+    if (obj[key] === undefined) {
+      delete(obj[key]);
+    }
+  }
+  return obj;
+}
+
+function filterBuilder(filterParams){
+    //filter body where no input received
+    let params = filterUndefined(filterParams);
+
+    let myValArray = [];
+    let queryFor = [];
+
+    //puts the keys and values into arrays
+    for (let key in params) {
+      myValArray.push(params[key])
+      queryFor.push(key)
+    }
+    //makes individual query conditions for each filter parameter
+    for (let i = 0; i < queryFor.length; i++) {
+      if (queryFor[i] === 'name') {
+        myValArray[i] =  "%" + myValArray[i] + "%"
+        queryFor[i] = `name LIKE $${i+1}`
+      }
+      if (queryFor[i] === 'minEmployees') {
+        queryFor[i] = `num_employees >= $${i+1}`
+      }
+      if (queryFor[i] === 'maxEmployees') {
+        queryFor[i] = `num_employees <= $${i+1}`
+      }
+    }
+
+    // joins individual conditions into one WHERE statement
+    let finalQuery = "";
+    if (queryFor.length > 0) {
+      finalQuery += "WHERE " + queryFor.join(" AND ");
+    }
+    return {finalQuery, myValArray};
+  }
+
+module.exports = { sqlForPartialUpdate, filterBuilder };

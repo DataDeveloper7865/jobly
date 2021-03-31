@@ -2,7 +2,7 @@
 
 const db = require("../db");
 const { BadRequestError, NotFoundError } = require("../expressError");
-const { sqlForPartialUpdate } = require("../helpers/sql");
+const { sqlForPartialUpdate, filterBuilder } = require("../helpers/sql");
 
 /** Related functions for companies. */
 
@@ -49,48 +49,8 @@ class Company {
    * Returns [{ handle, name, description, numEmployees, logoUrl }, ...]
    * */
 
-  static async findAll(body) {
-    console.log("Our body passed in is: ", body)
-    const { name, minEmployees, maxEmployees } = body
-    //filter body
-    let filteredBody = filterUndefined(body)
-    let myValArray = []
-    let positionsInQuery = []
-    let keyArray = []
-
-    let count = 1
-    for (let key in filteredBody) {
-      myValArray.push(filteredBody[key])
-      keyArray.push(key)
-      positionsInQuery.push(`$${count}`)
-      count += 1
-    }
-
-    for (let i = 0; i < keyArray.length; i++) {
-      if (keyArray[i] === 'name') {
-        positionsInQuery[i] = `name LIKE %${positionsInQuery[i]}%`
-      }
-      if (keyArray[i] === 'minEmployees') {
-        positionsInQuery[i] = `num_employees > ${positionsInQuery[i]}`
-      }
-      if (keyArray[i] === 'maxEmployees') {
-        positionsInQuery[i] = `num_employees < ${positionsInQuery[i]}`
-      }
-
-    }
-    console.log(positionsInQuery)
-
-
-    let finalQuery;
-    if (positionsInQuery.length > 0) {
-      finalQuery  = "WHERE " + positionsInQuery.join(" AND ")
-    } else {
-      finalQuery = ""
-    }
-
-    console.log("final query:", finalQuery)
-    console.log("values inserted: ", myValArray)
-
+  static async findAll(filterParams) {
+    const {finalQuery, myValArray} = filterBuilder(filterParams);
     const companiesRes = await db.query(
           `SELECT handle,
                   name,
@@ -184,14 +144,7 @@ class Company {
   }
 }
 
-function filterUndefined(obj) {
-  for (let key in obj) {
-    if (obj[key] === undefined) {
-      delete(obj[key])
-    }
-  }
-  return obj
-}
+
 
 
 module.exports = Company;

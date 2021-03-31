@@ -55,8 +55,8 @@ router.get("/", async function (req, res, next) {
     return next(new BadRequestError(errs));
   }
   const {minEmployees, maxEmployees} = req.query;
-  // !! refactor?
   if((minEmployees && maxEmployees) && (minEmployees > maxEmployees)){
+    //need to test this
     return next(new BadRequestError('min employees greater than max employees'))
   }
   const companies = await Company.findAll(req.query);

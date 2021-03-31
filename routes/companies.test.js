@@ -92,7 +92,44 @@ describe("GET /companies", function () {
               numEmployees: 3,
               logoUrl: "http://c3.img",
             },
-          ],
+          ]});
+    });
+  });
+  test("with filter data", async ()=> {
+    const resp = await request(app).get('/companies')
+      .query({name: 'C', maxEmployees: 5, minEmployees: 2})
+    expect(resp.statusCode).toEqual(200);
+    expect(resp.body).toEqual({
+      companies:
+          [
+            {
+              handle: "c2",
+              name: "C2",
+              description: "Desc2",
+              numEmployees: 2,
+              logoUrl: "http://c2.img",
+            },
+            {
+              handle: "c3",
+              name: "C3",
+              description: "Desc3",
+              numEmployees: 3,
+              logoUrl: "http://c3.img",
+            }
+          ]
+       });
+    });
+  test("incorrect filter data", async ()=> {
+    const resp = await request(app).get('/companies')
+      .query({name: 'C', maxEmployees: 5, minEmplyees: 2});
+    expect(resp.statusCode).toEqual(400);
+    expect(resp.body).toEqual({
+      "error": {
+        "message": [
+          "instance is not allowed to have the additional property \"minEmplyees\""
+        ],
+        "status": 400
+      }
     });
   });
 
@@ -106,7 +143,6 @@ describe("GET /companies", function () {
         .set("authorization", `Bearer ${u1Token}`);
     expect(resp.statusCode).toEqual(500);
   });
-});
 
 /************************************** GET /companies/:handle */
 
