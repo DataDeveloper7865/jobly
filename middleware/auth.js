@@ -5,6 +5,7 @@
 const jwt = require("jsonwebtoken");
 const { SECRET_KEY } = require("../config");
 const { UnauthorizedError } = require("../expressError");
+const User = require("../models/user");
 
 
 /** Middleware: Authenticate user.
@@ -22,7 +23,6 @@ function authenticateJWT(req, res, next) {
     if (authHeader) {
       const token = authHeader.replace(/^[Bb]earer /, "").trim();
       res.locals.user = jwt.verify(token, SECRET_KEY);
-      console.log(res.locals.user)
     }
     return next();
   } catch (err) {
@@ -46,15 +46,39 @@ function ensureLoggedIn(req, res, next) {
 
 function ensureAdmin(req, res, next) {
   try {
-    if (!res.locals.user.isAdmin) throw new UnauthorizedError();
+    if (!res.locals.user || !res.locals.user.isAdmin) throw new UnauthorizedError();
     return next();
   } catch (err) {
     return next(err);
   }
 }
 
+function ensureAdminOrCurr(req, res, next) {
+  try {
+    // check if username exists, return 404 if not
+    if (!res.locals.user || (!res.locals.user.isAdmin 
+          && res.locals.user.username !== req.params.username)) throw new UnauthorizedError();
+    return next();
+  } catch (err) {
+    return next(err);
+  }
+}
+
+async function ifNotFound404(req, res, next) {
+  try {
+    const user = await User.get(req.params.username);
+    res.locals.accessedUser = user;
+    return next();
+  } catch(e){
+    return next(e);
+  }
+}
+
+//!! how can we get more messages from the error server?
 
 module.exports = {
+  ifNotFound404,
+  ensureAdminOrCurr,
   authenticateJWT,
   ensureLoggedIn,
   ensureAdmin

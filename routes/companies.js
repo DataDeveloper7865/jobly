@@ -47,6 +47,8 @@ router.post("/", ensureAdmin, async function (req, res, next) {
  * Authorization required: none
  */
 
+// !! How does the client (in a normal situation) know when to send the token?
+
 router.get("/", async function (req, res, next) {
   //check for incorrect filters
   const validator = jsonschema.validate(req.query, companyFilterSchema);
