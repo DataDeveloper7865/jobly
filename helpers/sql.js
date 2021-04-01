@@ -50,11 +50,21 @@ function filterBuilder(filterParams){
         myValArray[i] =  "%" + myValArray[i] + "%"
         queryFor[i] = `name LIKE $${i+1}`
       }
-      if (queryFor[i] === 'minEmployees') {
+      else if (queryFor[i] === 'minEmployees') {
         queryFor[i] = `num_employees >= $${i+1}`
       }
-      if (queryFor[i] === 'maxEmployees') {
+      else if (queryFor[i] === 'maxEmployees') {
         queryFor[i] = `num_employees <= $${i+1}`
+      }
+      else if (queryFor[i] === 'title') {
+        myValArray[i] =  "%" + myValArray[i] + "%"
+        queryFor[i] = `title ILIKE $${i+1}`
+      }
+      else if (queryFor[i] === 'minSalary') {
+        queryFor[i] = `minSalary >= $${i+1}`
+      }
+      else if (queryFor[i] === 'hasEquity' && myValArray[i] === true) {
+        queryFor[i] = `hasEquity > 0.000`
       }
     }
 

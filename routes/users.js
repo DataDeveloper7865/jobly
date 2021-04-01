@@ -17,7 +17,7 @@ const router = express.Router();
 
 // Add new users, requires admin token
 
-router.post("/", ensureAdmin, async function (req, res, next) {
+router.post("/", ensureAdmin, async function (req, res, next) { 
   const validator = jsonschema.validate(req.body, userNewSchema);
   if (!validator.valid) {
     const errs = validator.errors.map(e => e.stack);

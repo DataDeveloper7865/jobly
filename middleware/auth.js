@@ -44,6 +44,11 @@ function ensureLoggedIn(req, res, next) {
   }
 }
 
+/** TODO: Middleware to use when they must be logged in.
+ *
+ * If not, raises Unauthorized.
+ */
+
 function ensureAdmin(req, res, next) {
   try {
     if (!res.locals.user || !res.locals.user.isAdmin) throw new UnauthorizedError();
