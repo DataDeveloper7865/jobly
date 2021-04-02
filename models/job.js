@@ -17,14 +17,6 @@ class Job {
    * */
 
   static async create({ title, salary, equity, companyHandle}) {
-    // const duplicateCheck = await db.query(
-    //       `SELECT handle
-    //        FROM companies
-    //        WHERE handle = $1`,
-    //     [handle]);
-
-    // if (duplicateCheck.rows[0])
-    //   throw new BadRequestError(`Duplicate company: ${handle}`);
 
     const result = await db.query(
           `INSERT INTO jobs
@@ -106,7 +98,7 @@ class Job {
     const { setCols, values } = sqlForPartialUpdate(
         data,
         {
-          companyHandle: "company_handle"
+          // companyHandle: "company_handle"
         });
     const handleVarIdx = "$" + (values.length + 1);
 
@@ -143,7 +135,15 @@ class Job {
 
     if (!job) throw new NotFoundError(`No job at this id: ${job}`);
   }
+
+
+
+
+
 }
+
+
+
 
 function checkInt(id){
   if(isNaN(parseInt(id))){
