@@ -23,13 +23,15 @@ function sqlForPartialUpdate(dataToUpdate, jsToSql) {
   };
 }
 
-function filterUndefined(obj) {
-  for (let key in obj) {
-    if (obj[key] === undefined) {
-      delete(obj[key]);
+function filterUndefined(filterObj) {
+  for (let key in filterObj) {
+    if (filterObj[key] === undefined ||
+      (key === "hasEquity" && filterObj[key] !== "true")) {
+      delete(filterObj[key]);
+
     }
   }
-  return obj;
+  return filterObj;
 }
 
 function filterBuilder(filterParams){
@@ -48,31 +50,34 @@ function filterBuilder(filterParams){
     for (let i = 0; i < queryFor.length; i++) {
       if (queryFor[i] === 'name') {
         myValArray[i] =  "%" + myValArray[i] + "%"
-        queryFor[i] = `name LIKE $${i+1}`
+        queryFor[i] = `name LIKE $${i+1}`;
       }
       else if (queryFor[i] === 'minEmployees') {
-        queryFor[i] = `num_employees >= $${i+1}`
+        queryFor[i] = `num_employees >= $${i+1}`;
       }
       else if (queryFor[i] === 'maxEmployees') {
-        queryFor[i] = `num_employees <= $${i+1}`
+        queryFor[i] = `num_employees <= $${i+1}`;
       }
       else if (queryFor[i] === 'title') {
         myValArray[i] =  "%" + myValArray[i] + "%"
-        queryFor[i] = `title ILIKE $${i+1}`
+        queryFor[i] = `title ILIKE $${i+1}`;
       }
       else if (queryFor[i] === 'minSalary') {
-        queryFor[i] = `minSalary >= $${i+1}`
+        queryFor[i] = `salary >= $${i+1}`;
       }
-      else if (queryFor[i] === 'hasEquity' && myValArray[i] === true) {
-        queryFor[i] = `hasEquity > 0.000`
+      //dis a bih
+      else if (queryFor[i] === 'hasEquity') {
+        queryFor[i] = `equity > ${i+1}`;
+        myValArray[i] = '0.000000';
       }
     }
-
+    console.log(queryFor, myValArray)
     // joins individual conditions into one WHERE statement
     let finalQuery = "";
     if (queryFor.length > 0) {
       finalQuery += "WHERE " + queryFor.join(" AND ");
     }
+    console.log(finalQuery, "HEREEE")
     return {finalQuery, myValArray};
   }
 

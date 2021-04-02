@@ -3,21 +3,21 @@
   "$id": "http://our.company.com/companyUpdate.schema.json",
   "type": "object",
   "properties": {
-    "name": {
+    "title": {
       "type": "string",
       "minLength": 1,
       "maxLength": 30
     },
-    "description": {
+    "salary": {
+      "type": "integer",
+      "minLength": 1,
+      "maxLength": 10
+    },
+    "equity": {
       "type": "string"
     },
-    "numEmployees": {
-      "type": "integer",
-      "minimum": 0
-    },
-    "logoUrl": {
-      "type": "string",
-      "format": "uri"
+    "companyHandle": {
+      "type": "string"
     }
   },
   "additionalProperties": false,

@@ -6,7 +6,7 @@
       "title": {
         "type": "string",
         "minLength": 1,
-        "maxLength": 30
+        "maxLength": 100
       },
       "salary": {
         "type": "integer",

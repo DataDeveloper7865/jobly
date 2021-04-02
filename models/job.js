@@ -71,12 +71,13 @@ class Job {
    **/
 
   static async get(id) {
+    checkInt(id);
     const jobRes = await db.query(
           `SELECT id,
                   title,
                   salary,
                   equity,
-                  company_handle AS "companyHandle",
+                  company_handle AS "companyHandle"
            FROM jobs
            WHERE id = $1`,
         [id]);
@@ -101,6 +102,7 @@ class Job {
    */
 
   static async update(id, data) {
+    checkInt(id);
     const { setCols, values } = sqlForPartialUpdate(
         data,
         {
@@ -110,13 +112,13 @@ class Job {
 
     const querySql = `UPDATE jobs 
                       SET ${setCols} 
-                      WHERE handle = ${handleVarIdx} 
+                      WHERE id = ${handleVarIdx} 
                       RETURNING id, 
                                 title, 
                                 salary, 
                                 equity, 
                                 company_handle AS "companyHandle"`;
-    const result = await db.query(querySql, [...values, handle]);
+    const result = await db.query(querySql, [...values, id]);
     const job = result.rows[0];
 
     if (!job) throw new NotFoundError(`No job at this id: ${id}`);
@@ -130,6 +132,7 @@ class Job {
    **/
 
   static async remove(id) {
+    checkInt(id);
     const result = await db.query(
           `DELETE
            FROM jobs
@@ -139,6 +142,12 @@ class Job {
     const job = result.rows[0];
 
     if (!job) throw new NotFoundError(`No job at this id: ${job}`);
+  }
+}
+
+function checkInt(id){
+  if(isNaN(parseInt(id))){
+    throw new NotFoundError(`No job at this id: ${id}`);
   }
 }
 
